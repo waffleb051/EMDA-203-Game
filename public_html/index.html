@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+Coded by Brian Busk II
+Most code is created under Creative Commons, except for KeyMonkey created by 
+Adam Callaway, for Southern Oregon University EMDA 203 and the Cheet.js to add some flair.
+Seriously if you have a chance check out the site just Google it. 
+BAC- Blood Alcohol Level
+Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore because no sprites
+
+-->
+<html>
+    <head>
+        <title>Still Untitled</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="JS/createjs-2015.11.26.min.js"></script>
+        <script src="JS/KeyMonkey.js"></script>
+        <script src="JS/cheet.js"></script>
+        <script src="JS/creatOr.js"></script>
+        <script>
+            //Global Variables
+            var mainStage; //creation of the main stage
+            var playName; //allows for the user to place their name in 
+            var playCharacter; //the character
+            var playScore = 0; //the players score
+            var LastplayerScore;
+            var lives = 3;
+            var shark; //the shark
+            var shell; //the shell
+            var ball; //the ball
+            var kPressed; //handles the keypress
+            var key; //handles which key is pressed
+
+            //Loading of the music, and a few images
+            var mQueue = new createjs.LoadQueue();
+            createjs.Sound.alternateExtensions = ["mp3"];
+            mQueue.installPlugin(createjs.Sound);
+            mQueue.addEventListener("complete", musicComplete);
+            mQueue.loadManifest([
+                {id: "main", src: "Music/21st Century Surf.mp3", data: 5}
+//                {id: "player", src: "Images/"},
+//                {id: "shark", src: "Images/"},
+//                {id: "ball", src: "Images/"},
+//                {id: "shell", src: "Images/"} //note to self take the comma out to remove an error
+            ]);//end Preloader
+
+            function musicComplete() {
+                init();
+            }//end musicComplete
+
+            function init() {
+
+                //Stage Creation
+                mainStage = new createjs.Stage(document.getElementById("Canvas"));
+                //Placing the stage directions
+                mainStage.NORTH = 0;
+                mainStage.SOUTH = 2;
+                mainStage.EAST = 1;
+                mainStage.WEST = 3;
+
+                //defining the tile sizes
+                mainStage.tileSize = 40; //MAY CHANGE DEPENDING ON THE MISSING SPRITE (05/16)
+
+                //Array to handle keypresses
+                kPressed = [];
+                //Designated keys array
+                key = {w: 87, a: 65, s: 83, d: 68, up: 38, down: 40, left: 37, right: 39};
+                
+                //Score floater array
+                ScoreText = [];
+                
+                //User name floater
+                
+                
+                //Shark 
+                
+                
+
+                //Playing the music
+                //commented to save my sanity....debugging this code
+                //wait chrome has a mute tab option, thank the Force
+                var museInstance = createjs.Sound.play("Music/21st Century Surf.mp3", {loop: -1});
+                museInstance.on("loop", handleLoop);
+                function handleLoop(event) {
+                    museInstance.volume = museInstance.volume * 0.5;
+                }
+                //createjs.Sound.play("main");
+
+                //Presenting the true creator 
+                //This will be edited out in the builds but not in the final 
+                cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
+                    alert('Check the Console logs', creatOr);
+                });
+                //I think this is using a similar function base to the KeyMonkey Class
+                
+                //display the player score and the players lives
+                //player score
+                sDisplay.x = 20;
+                sDisplay.y = 10;
+                sDisplay.textBaseline = "alphabetic";
+                
+                createjs.Ticker.setFPS(12);
+                createjs.Ticker.addEventListener("tick", NewFrame);
+            }//end init
+            function NewFrame(evt) {
+                if(playerScore>=0){
+                    if(playerScore>LastplayerScore){
+                        
+                    }
+                }
+                mainStage.update();
+            }//end NewFrame
+        </script>
+    </head>
+    <body>
+        <div>TODO write content</div>
+        <!---Modify the canvase based on size of window--->
+        <canvas id="Canvas" width="512" height="512">Sorry. You need an HTML5 compatible browser to see this.</canvas>
+    </body>
+</html>

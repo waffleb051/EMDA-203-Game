@@ -1,0 +1,260 @@
+Need to find out if there is a wait command, private variables that can be used in the index page.
+Build an Array to hold high scores and display on the right hand side of the screen. 
+Create a user text box for th users name.
+Implament the kanami code to expose the user to the real creator of the game.
+Redo the wave and background. 
+Create a false spritesheet to be used in the final version.
+Figure out how to make a movement with the sharks randoming spawning (including the balloon and the shell)
+Create an if loop to track how many lives the user has (maybe a function)
+
+
+function init(){
+
+		st = new createjs.Stage(document.getElementById("myCanvas"));
+
+		//floating hitpoint adjustment text array....
+		hpFloatTexts = [];
+
+		st.NORTH = 0;
+		st.EAST = 1;
+		st.SOUTH = 2;
+		st.WEST = 3;
+
+		st.tileSize = 64;
+
+		var background = new createjs.Bitmap("images64/thorntonsWorld.png");
+		st.addChild(background);
+
+		dagger = new createjs.Bitmap("images64/itemDagger128.png");
+		dagger.x = 1*st.tileSize;
+		dagger.y = 7*st.tileSize;
+		//here we're creating a simple version of a bounding box for collision detection
+		//it's a creatjs.Rectangle, which is an x, y and width, height
+
+		dagger.box = new createjs.Rectangle(dagger.x, dagger.y, 128, 128);
+		
+		st.addChild(dagger);
+
+		pyramid = new createjs.Bitmap("images64/itemPyramid128.png");
+		pyramid.x = 7*st.tileSize;
+		pyramid.y = 1*st.tileSize;
+		//again, we're creating a simple version of a bounding box for collision detection
+		pyramid.box = new createjs.Rectangle(pyramid.x, pyramid.y, 128, 128);
+		
+		st.addChild(pyramid);
+
+		var spriteData = new createjs.SpriteSheet({
+		   "images": ["images64/thorntonSprite.png"],
+		   "frames": {width:64, height:64,count:20},
+		   "animations": { 
+	   		    "die": {	//his death animation, a sequence of frames, no 'next' animatino to play, and play it at 12.5% normal speed
+			        frames: [2,2,2,2,6,6,7,7,11,11,11,15,15,12,12,12,12,12,12,12,12,12,16,12,8,4,8,12,12,12],
+			        next: false,
+			        speed: 0.125
+			    }
+			}
+		});
+		thorn = new createjs.Sprite(spriteData);
+		thorn.direction = st.EAST;
+		thorn.frameCounter = 0;
+		thorn.frameSkip = 12;
+		thorn.skipCounter = 0;
+
+		thorn.snapToPixel = true;
+
+		thorn.setFrame = function() {
+			if(thorn.skipCounter >= thorn.frameSkip) {
+				thorn.frameCounter += 1;
+				thorn.gotoAndStop(thorn.frameCounter*4 + thorn.direction);
+				thorn.skipCounter = 0;
+			}
+			thorn.skipCounter++;
+		}
+
+		thorn.speed = 4;
+		thorn.x = 4*st.tileSize;
+		thorn.y = 4*st.tileSize;
+
+		//thornton's hitpoints!
+		thorn.maxhp = 50;
+		thorn.hp = thorn.maxhp;
+
+		//a couple boolean properties to track whether he's dying or is dead...
+		//states
+		thorn.isDying = false;
+		thorn.isDead = false;
+
+		//again, we're creating a simple version of a bounding box for collision detection
+		thorn.box = new createjs.Rectangle(thorn.x, thorn.y, 64, 64);
+
+		/*
+		Basic rectangular collision between Thornton and some other object.
+		They are NOT colliding if:
+		A)  Thornton's left edge is greater than (on the x-axis) the other object's right edge.
+		B)	Thornton's right edge is less than (on the x-axis) the other object's left edge.
+		C)	Thornton's top edge is greater than (on the y-axis) the other object's bottom edge.
+		D)	Thornton's bottom edge is less than (on the y-axis) the other object's top edge.
+
+		0 ------------- X ---------------> max x
+		|
+		|               ---
+		|              | C |
+		|               ---
+		|
+		|             -------
+		      ---    |       |    ---
+		Y    | A |   | thorn |   | B |
+		      ---    |       |    ---
+		|             -------
+		|
+		|               ---
+		|              | D |
+		|               ---
+		v
+		max y
+		
+		*/
+		thorn.collidesWith = function(other) {
+		 	if(!(other.box)) {
+		 		console.log("Error in collidesWith. "+other+" does not have a collision box.");
+		 		return undefined;
+		 	}
+		 	
+		 	//if they're NOT colliding (this is one big if statement, with 4 conditions, any of which make it true)
+			if (                  this.box.x >= other.box.x + other.box.width  || 	//case A
+				 this.box.x + this.box.width <= other.box.x                    || 	//case B
+				                  this.box.y >= other.box.y + other.box.height || 	//case C
+				this.box.y + this.box.height <= other.box.y)                		//case D
+				{ return false; }	//'thorn.collidesWith(someObject)' <-- will return false if no collision
+			//else return true, because they must be colliding!
+			else {
+				return true;
+			}
+		}
+
+		//we need to update the x & y position of thornton's bounding box when he moves!
+		thorn.updateBox = function() {
+			this.box.x = this.x;
+			this.box.y = this.y;
+		}
+
+		//we also need to check his hitpoints each draw to see if he's dead or over his max
+		thorn.adjustHealth = function(hpValue) {
+			//adjust his hitpoints by the hpValue argument (-1 or 2 in our example)
+			this.hp += hpValue;
+
+			//just a little piece of text to add to the end of the hpDisplay if he dies
+			var deadMsg = deadMsg || "";
+			//if adding hpValue makes his hp go over the max, set it to the max
+			if(this.hp > this.maxhp) { this.hp = this.maxhp; }
+			//else if adding hpValue makes his hp go under 0, make him dead!
+			else if(this.hp <= 0) {
+				this.hp = 0;
+				this.isDead = true;	//basically put him in the 'dead' state so we can start his death animation
+				deadMsg = "\n\n...he's dead, Jim!";
+				thorn.die();
+			}
+			hpDisplay.text = "HP: "+thorn.hp+deadMsg;
+			var newText;
+			if(hpValue > 0 && !(thorn.hp == thorn.maxhp)) {
+				newText = new createjs.Text("+"+hpValue,"bold 32px Arial", "#FF0");
+				createjs.Sound.play("bell");
+			}
+			else if(hpValue < 0) {
+				newText = new createjs.Text(hpValue,"bold 32px Arial", "#F00");
+				createjs.Sound.play("ouch");
+			}
+			else {
+				newText = new createjs.Text("","bold 32px Arial", "rgba(255,255,255,1)");
+			}
+			hpFloatTexts.push(newText);
+			st.addChild(newText);
+			newText.x = thorn.x;
+			newText.y = thorn.y + 32;
+
+			while(hpFloatTexts.length > 4) {	//while our array has more than 4 elements in it, so keep doing it til we're down to 4 max
+				st.removeChild(hpFloatTexts[0]);
+				hpFloatTexts.splice(0,1);	//remove the first one -- see http://www.w3schools.com/jsref/jsref_splice.asp
+			}
+
+			console.log("length "+hpFloatTexts.length);
+
+			for(var z = 0; z < hpFloatTexts.length; z++) {
+				hpFloatTexts[z].y -= 32;
+				hpFloatTexts[z].alpha = (z+1)/4;
+			}
+		}
+
+		//function to make him die
+		//setting the regX and regY to his middle so he can rotate properly
+		thorn.die = function() {
+			thorn.gotoAndPlay("die");
+			thorn.regX = thorn.regY = 32;
+			thorn.x += 32;
+			thorn.y += 32;
+			for(var i = 0; i < hpFloatTexts.length; i++) {
+				st.removeChild(hpFloatTexts[i]);
+			}
+			hpFloatTexts = [];
+		}
+
+		st.addChild(thorn);
+
+		hpDisplay = new createjs.Text("HP: "+thorn.hp, "bold 64px Arial", "#000");
+		hpDisplay.x = 1*st.tileSize;
+		hpDisplay.y = 1*st.tileSize;
+		st.addChild(hpDisplay);
+
+
+		createjs.Ticker.addEventListener('tick', drawNewFrame);
+		createjs.Ticker.setFPS(48);
+	}
+
+
+	//our game & animation 'tick' function that fires off 48 times a second (or whatever FPS gets changed to)
+	function drawNewFrame(evt){
+
+		//now we wrap our animation, movement, and collision checks in a conditional so we don't use them if he's dead!
+		if(!thorn.isDead) {
+
+			if(keyMonkey['up'] || keyMonkey['w'])    { thorn.y -= thorn.speed; thorn.direction = st.NORTH; }
+			if(keyMonkey['down'] || keyMonkey['s'])  { thorn.y += thorn.speed; thorn.direction = st.SOUTH; }
+			if(keyMonkey['left'] || keyMonkey['a'])  { thorn.x -= thorn.speed; thorn.direction = st.WEST;  }
+			if(keyMonkey['right'] || keyMonkey['d']) { thorn.x += thorn.speed; thorn.direction = st.EAST;  }
+
+
+			if(thorn.x > st.tileSize*8) { thorn.x = st.tileSize*8; }
+			else if(thorn.x < st.tileSize*1) { thorn.x = st.tileSize*1; }
+
+			if(thorn.y > st.tileSize*8) { thorn.y = st.tileSize*8; }
+			else if(thorn.y < st.tileSize*1) { thorn.y = st.tileSize*1; }
+
+			thorn.updateBox();
+
+			if(frameCount % framesPerTick == 0) {
+				if(thorn.collidesWith(dagger)) {
+					console.log("ouch!");
+					thorn.adjustHealth(-1);
+				}
+				else if(thorn.collidesWith(pyramid)) {
+					console.log("ahhhh...");
+					thorn.adjustHealth(2);
+				}
+				else {
+					thorn.adjustHealth(0);
+				}
+			}
+			thorn.setFrame();
+		}
+		//he's dead...
+		else if(thorn.isDead) {
+			if(Math.abs(thorn.rotation) < 180) {
+				thorn.rotation-=2;
+			}
+
+		}
+
+		st.update();
+		frameCount++;
+	}
+
