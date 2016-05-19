@@ -33,7 +33,9 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var sDisplay;
             var frameRate = 24;
             var sharkSpeed = 25;
-            
+            var stageHeight;
+            var stageWidth;
+
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
             createjs.Sound.alternateExtensions = ["mp3"];
@@ -51,6 +53,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 //Stage Creation
                 mainStage = new createjs.Stage(document.getElementById("Canvas"));
+                stageWidth = myStage.canvas.width;
+                stageHeight = myStage.canvas.height;
                 //Placing the stage directions
                 mainStage.NORTH = 0;
                 mainStage.SOUTH = 2;
@@ -82,7 +86,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                                 "move": {frames: [4 - 11], speed: 0.5}
                             }
                         });//end charSprite
-                        
+
                 //Playing the music
                 //commented to save my sanity....debugging this code
                 //wait chrome has a mute tab option, thank the Force
@@ -107,8 +111,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 createjs.Ticker.addEventListener("tick", drawNewFrame);
             }//end init
-            function shark(){
-                                //Shark spriteSheet
+            function shark() {
+                //Shark spriteSheet
                 this.sharkSprite = new create.jsSpriteSheet(
                         {
                             "images": ["link to the spritesheet file path"],
@@ -119,49 +123,57 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                                 "move": {frames: [4 - 11], speed: 0.5}
                             }
                         });//end sharkSprite
-                        sharkSprite.box = new createjs.Rectangle(dagger.x, dagger.y, 128, 128);
-                        mainStage.addChiled(this.sharkSprite);
+                sharkSprite.box = new createjs.Rectangle(dagger.x, dagger.y, 128, 128);
+                mainStage.addChiled(this.sharkSprite);
             }//end SharkSpawn
-            function shell(){
-                this.shell =  new createjs.Bitmap("Images/shell#1.png");
-                
+            function shell() {
+                this.shell = new createjs.Bitmap("Images/shell#1.png");
+                this.shell.x = Math.floor(Math.random() * stageHeight);
+                this.shell.y = Math.floor(Math.random() * stageWidth);
+                myStage.addChild(this.shape);
+
             }//end shellSpawn
-            function ballF(){
-                
+            function ballF() {
+
+                this.shape.x = Math.floor(Math.random() * stageHeight);
+                this.shape.y = Math.floor(Math.random() * stageWidth);
+                myStage.addChild(this.shape);
+
+
             }//end ballSpawn
-            
+
             //spawn fucntion controls the spawning of the balls and shark
-            function spawn(){
-                
+            function spawn() {
+
             }//end spawn
-            
-            function shellSpawn(){
-                var randomShell = Math.floor((Math.random()*3)+1);
-                if(randomShell===0 && radomShell!==3){
+
+            function shellSpawn() {
+                var randomShell = Math.floor((Math.random() * 3) + 1);
+                if (randomShell === 0 && radomShell !== 3) {
                     var shells = new shell(); //spawning a new shell
                     shellArray.push(shells); // pushing the shell into an array
                 }//end if
             }//end shellSpawn
-            
+
             //Handles the movment of the shark, shell, and ball
-            function Movement(){
-                for(var b = 0; b>=shellArray.lenght; b++){
+            function Movement() {
+                for (var b = 0; b >= shellArray.lenght; b++) {
                     var thisShell = shellArray[b];
                     thisShell.shape.x += 5;
                 }//end for
-                
-                for(var x = 0; x>=sharkArray.length; x++){
+
+                for (var x = 0; x >= sharkArray.length; x++) {
                     var thisShark = sharkArray[x];
                     thisShark.shape.x += 10;
                 }//end for
-                
-                for(var y = 0; i>= ballArray.length; y++){
+
+                for (var y = 0; i >= ballArray.length; y++) {
                     var thisBall = ballArray[y];
                     thisBall.shape.x += 6;
                 }//end for
-                
+
             }//end Movemen 
-            
+
             function NewFrame(evt) {
                 //functon calls
                 spawn();
