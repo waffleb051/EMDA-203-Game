@@ -24,13 +24,16 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var playCharacter; //the character
             var playScore = 0; //the players score
             var LastplayerScore;
-            var lives = 3;
-            var shark; //the shark
-            var shell; //the shell
-            var ball; //the ball
+            var charSprite;
+            var sharkSprite; //the shark //array
+            var shellArray = new Array(); //the shell // array
+            var ball; //the ball //array
             var kPressed; //handles the keypress
             var key; //handles which key is pressed
-
+            var sDisplay;
+            var frameRate = 24;
+            var sharkSpeed = 25;
+            
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
             createjs.Sound.alternateExtensions = ["mp3"];
@@ -38,11 +41,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             mQueue.addEventListener("complete", musicComplete);
             mQueue.loadManifest([
                 {id: "main", src: "Music/21st Century Surf.mp3", data: 5}
-//                {id: "player", src: "Images/"},
-//                {id: "shark", src: "Images/"},
-//                {id: "ball", src: "Images/"},
-//                {id: "shell", src: "Images/"} //note to self take the comma out to remove an error
-            ]);//end Preloader
+            ]); //end Preloader
 
             function musicComplete() {
                 init();
@@ -57,7 +56,6 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 mainStage.SOUTH = 2;
                 mainStage.EAST = 1;
                 mainStage.WEST = 3;
-
                 //defining the tile sizes
                 mainStage.tileSize = 40; //MAY CHANGE DEPENDING ON THE MISSING SPRITE (05/16)
 
@@ -65,26 +63,34 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 kPressed = [];
                 //Designated keys array
                 key = {w: 87, a: 65, s: 83, d: 68, up: 38, down: 40, left: 37, right: 39};
-                
                 //Score floater array
                 ScoreText = [];
-                
+                //background imgae
+                var background = new createjs.Bitmap("Images/background.png");
+                mainStage.addChild(background);
                 //User name floater
-                
-                
-                //Shark 
-                
-                
 
+
+                //Chracter SpriteSheet
+                charSprite = new create.jsSpriteSheet(
+                        {
+                            "images": ["link to the spritesheet file path"],
+                            "frames": {width: 128, height: 128, count: 48},
+                            "animation": {
+                                "idle": {frames: [0]},
+                                "blink": {frames: [1, 2, 3], speed: 0.08, next: "idle"},
+                                "move": {frames: [4 - 11], speed: 0.5}
+                            }
+                        });//end charSprite
+                        
                 //Playing the music
                 //commented to save my sanity....debugging this code
                 //wait chrome has a mute tab option, thank the Force
-                var museInstance = createjs.Sound.play("Music/21st Century Surf.mp3", {loop: -1});
+                var museInstance = createjs.Sound.play("main", {loop: -1});
                 museInstance.on("loop", handleLoop);
                 function handleLoop(event) {
                     museInstance.volume = museInstance.volume * 0.5;
                 }
-                //createjs.Sound.play("main");
 
                 //Presenting the true creator 
                 //This will be edited out in the builds but not in the final 
@@ -92,29 +98,87 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     alert('Check the Console logs', creatOr);
                 });
                 //I think this is using a similar function base to the KeyMonkey Class
-                
+
                 //display the player score and the players lives
                 //player score
-                sDisplay.x = 20;
-                sDisplay.y = 10;
-                sDisplay.textBaseline = "alphabetic";
-                
-                createjs.Ticker.setFPS(12);
-                createjs.Ticker.addEventListener("tick", NewFrame);
+//                sDisplay.x = 20;
+//                sDisplay.y = 10;
+//                sDisplay.textBaseline = "alphabetic";
+
+                createjs.Ticker.addEventListener("tick", drawNewFrame);
             }//end init
+            function shark(){
+                                //Shark spriteSheet
+                this.sharkSprite = new create.jsSpriteSheet(
+                        {
+                            "images": ["link to the spritesheet file path"],
+                            "frames": {width: 128, height: 128, count: 48},
+                            "animation": {
+                                "idle": {frames: [0]},
+                                "blink": {frames: [1, 2, 3], speed: 0.08, next: "idle"},
+                                "move": {frames: [4 - 11], speed: 0.5}
+                            }
+                        });//end sharkSprite
+                        sharkSprite.box = new createjs.Rectangle(dagger.x, dagger.y, 128, 128);
+                        mainStage.addChiled(this.sharkSprite);
+            }//end SharkSpawn
+            function shell(){
+                this.shell =  new createjs.Bitmap("Images/shell#1.png");
+                
+            }//end shellSpawn
+            function ballF(){
+                
+            }//end ballSpawn
+            
+            //spawn fucntion controls the spawning of the balls and shark
+            function spawn(){
+                
+            }//end spawn
+            
+            function shellSpawn(){
+                var randomShell = Math.floor((Math.random()*3)+1);
+                if(randomShell===0 && radomShell!==3){
+                    var shells = new shell(); //spawning a new shell
+                    shellArray.push(shells); // pushing the shell into an array
+                }//end if
+            }//end shellSpawn
+            
+            //Handles the movment of the shark, shell, and ball
+            function Movement(){
+                for(var b = 0; b>=shellArray.lenght; b++){
+                    var thisShell = shellArray[b];
+                    thisShell.shape.x += 5;
+                }//end for
+                
+                for(var x = 0; x>=sharkArray.length; x++){
+                    var thisShark = sharkArray[x];
+                    thisShark.shape.x += 10;
+                }//end for
+                
+                for(var y = 0; i>= ballArray.length; y++){
+                    var thisBall = ballArray[y];
+                    thisBall.shape.x += 6;
+                }//end for
+                
+            }//end Movemen 
+            
             function NewFrame(evt) {
-                if(playerScore>=0){
-                    if(playerScore>LastplayerScore){
-                        
-                    }
-                }
+                //functon calls
+                spawn();
+                shellSpawn();
+//                if(playerScore != 0){
+//                    if(playerScore>LastplayerScore){
+//                        
+//                    }//end if 
+//                    else(playerScore<=LastplayerScore){
+//                    
+//                }//end else
                 mainStage.update();
             }//end NewFrame
         </script>
     </head>
     <body>
-        <div>TODO write content</div>
-        <!---Modify the canvase based on size of window--->
-        <canvas id="Canvas" width="512" height="512">Sorry. You need an HTML5 compatible browser to see this.</canvas>
+        <!---Modify the canvase based on size of window-->
+        <canvas id="Canvas" width="1920" height="1200">Sorry. You need an HTML5 compatible browser to see this.</canvas>
     </body>
 </html>
