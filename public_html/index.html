@@ -15,12 +15,14 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="JS/createjs-2015.11.26.min.js"></script>
         <script src="JS/KeyMonkey.js"></script>
+        <script src="js/collisionGnome.js"></script>
         <script>
             //Global Variables
             var mainStage; //creation of the main stage
-            var playName; //allows for the user to place their name in 
-            var playCharacter; //the character
-            var playScore = 0; //the players score
+            var Character; //the character
+            var charLives = 3;
+            var mainScore = 0;
+            var playScoreDisplay = new createjs.Text(mainScore.toString() + " Current score", "40px Arial", "#000000");
             var LastplayerScore;
             var charSprite;
             var characterSpeed = 5;
@@ -28,14 +30,12 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var shellArray = new Array(); //the shell array
             var ballArray = new Array(); //the ball array
             var sharkArray = new Array(); //the shark array
+            var sharkBites = 0;
             var kPressed; //handles the keypress
             var key; //handles which key is pressed
             var sDisplay;
             var frameRate = 24;
-            var sharkSpeed = 25;
-            var stageHeight;
-            var stageWidth;
-            
+
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
             createjs.Sound.alternateExtensions = ["mp3"];
@@ -53,22 +53,29 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 //Stage Creation
                 mainStage = new createjs.Stage(document.getElementById("Canvas"));
-                stageWidth = mainStage.canvas.width;
-                stageHeight = mainStage.canvas.height;
+
                 //Placing the stage directions
                 mainStage.NORTH = 0;
                 mainStage.SOUTH = 2;
                 mainStage.EAST = 1;
                 mainStage.WEST = 3;
                 //defining the tile sizes
+
                 mainStage.tileSize = 40; //MAY CHANGE DEPENDING ON THE MISSING SPRITE (05/16)
 
                 //Array to handle keypresses
                 kPressed = [];
+
                 //Designated keys array
                 key = {w: 87, a: 65, s: 83, d: 68, up: 38, down: 40, left: 37, right: 39};
+
                 //Score floater array
-                ScoreText = [];
+                mainStage.addEventListener(NewFrame);
+                playScoreDisplay.x = 20;
+                playScoreDisplay.y = 80;
+                playScoreDisplay.textBaseline = "alphabetic";
+                mainStage.addChild(playScoreDisplay);
+
                 //background imgae
                 var background = new createjs.Bitmap("Images/background.png");
                 mainStage.addChild(background);
@@ -86,6 +93,16 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 //                                "move": {frames: [4 - 11], speed: 0.5}
 //                            }
 //                        });//end charSprite
+//
+//                //creating a new character
+//                character = new createjs.Sprite(charSprite)
+//                character.gotoAndPlay("something");
+//
+//                character.x = 256;
+//                character.y = 256;
+//                character.speed = characterSpeed;
+//                
+//                collisionGnome.addCollider(character, 1.5);
 
                 //Playing the music
                 //commented to save my sanity....debugging this code
@@ -95,13 +112,10 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 function handleLoop(event) {
                     museInstance.volume = museInstance.volume * 0.5;
                 }
-                //display the player score and the players lives
-                //player score
-//                sDisplay.x = 20;
-//                sDisplay.y = 10;
-//                sDisplay.textBaseline = "alphabetic";
 
+                collisionGnome.setDebug(true);
                 createjs.Ticker.addEventListener("tick", NewFrame);
+                createjs.Ticker.setFPS(frameRate);
             }//end init
 
             function ShellSharkBallSpawn() {
@@ -109,39 +123,45 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 //Change the following images
                 this.shark = new createjs.Bitmap("Images/shell#1.png");
                 this.ball = new createjs.Bitmap("Images/shell#1.png");
-               
-               //Creating the starting spawn
-               //Shell
-               this.shell.x = Math.floor(Math.random() * stageWidth);
-               this.shell.y = 0;
-               //Shark
-               this.shark.y = Math.floor(Math.random() * stageWidth);
-               this.shark.x = 0;
-               //ball
-               this.ball.y = Math.floor(Math.random() * stageWidth);
-               this.ball.x = 0;
+
+                //Creating the starting spawn
+                //Shell
+                this.shell.x = Math.floor(Math.random() * stageWidth);
+                this.shell.y = 0;
+                //Shark
+                this.shark.y = Math.floor(Math.random() * stageWidth);
+                this.shark.x = 0;
+                //ball
+                this.ball.y = Math.floor(Math.random() * stageWidth);
+                this.ball.x = 0;
 
                 //Adding the characters to the stage
-                myStage.addChild(this.shell, this.ball, this.shark);
+                mainStage.addChild(this.shell, this.ball, this.shark);
             }//end ShellSharkBallSpawn
 
             //spawn fucntion controls the spawning of the shell, shark and ball
             function sssSpawnRate() {
-                var randomShell = Math.floor((Math.random() * 3) + 1);
-                if (randomShell === 0 && radomShell !== 3) {
-                    var shells = new ShellSharkBallSpawn(shell); //spawning a new shell
-                    shellArray.push(shells); // pushing the shell into an array
-                }//end if
-                var randomShark = Math.floor((Math.random() * 20) + 1);
-                if (randomShark === 0 && randomShark !== 20) {
-                    var sharks = new ShellSharkBallSpawn(shark); //spawning a new shell
-                    sharkArray.push(sharks); // pushing the shell into an array
-                }//end if
-                var randomBall = Math.floor((Math.random() * 20) + 1);
-                if (randomBall === 0 && radomBall !== 20) {
-                    var balls = new ShellSharkBallSpawn(ball); //spawning a new shell
-                    ballArray.push(balls); // pushing the shell into an array
-                }//end if
+                while (charLives == 3 || charLives <= 1) {
+                    var randomShell = Math.floor((Math.random() * 3) + 1);
+                    if (randomShell === 0 && radomShell !== 3) {
+                        var shells = new ShellSharkBallSpawn(shell); //spawning a new shell
+                        collisionGnome.addCollider(shell, 1.5);
+                        shellArray.push(shells); // pushing the shell into an array
+                    }//end if
+                    var randomShark = Math.floor((Math.random() * 20) + 1);
+                    if (randomShark === 0 && randomShark !== 20) {
+                        var sharks = new ShellSharkBallSpawn(shark); //spawning a new shell
+                        collisionGnome.addCollider(shark, 1.5);
+                        sharkArray.push(sharks); // pushing the shell into an array
+                    }//end if
+                    var randomBall = Math.floor((Math.random() * 20) + 1);
+                    if (randomBall === 0 && radomBall !== 20) {
+                        var balls = new ShellSharkBallSpawn(ball); //spawning a new shell
+                        collisionGnome.addCollider(ball, 1.5);
+                        ballArray.push(balls); // pushing the shell into an array
+                    }//end if
+                    charLives = charLives;
+                }//end while
             }//end sssSpawnRate
 
             //Handles the movment of the shark, shell, and ball
@@ -167,13 +187,72 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 //functon calls
                 sssSpawnRate();
                 Movement();
+
+                //if loop handling the movement 
+                if (keyMonkey["w"] || keyMonkey["up"]) {
+                    character.y -= character.speed;
+                }
+                if (keyMonkey["a"] || keyMonkey["left"]) {
+                    character.x -= character.speed;
+                }
+                if (keyMonkey["s"] || keyMonkey["down"]) {
+                    character.y += character.speed;
+                }
+                if (keyMonkey["d"] || keyMonkey["right"]) {
+                    character.x += character.speed;
+                }
+
+                if (character.x < 0 + character.xDist) {
+                    character.x = 0 + character.xDist;
+                }
+                if (character.y < 0 + character.yDist) {
+                    character.y = 0 + character.yDist;
+                }
+
+                if (character.x > mainStage.canvas.width - character.xDist) {
+                    character.x = mainStage.canvas.width - character.xDist
+                }
+                if (character.y > mainStage.canvas.height - character.yDist) {
+                    character.y = mainStage.canvas.height - character.yDist
+                }
+
+                //if loop handling the collision with the shark, ball or shell
+                if (character.collidesWith(ball) || character.collidesWith(shark) || character.collidesWith(shell)) {
+                    if (charLives != 0) {
+                        if (character.collidesWith(ball)) {
+                            //gain 500 points
+                            mainScore = mainScore + 500;
+
+                        }//end if 
+                        if (character.collidesWith(shell)) {
+                            //gain a life back
+                            charLives = charLives + 1;
+                            mainScore = mainScore + 1000;
+
+                        }//end if
+                        if (character.collidesWith(shark)) {
+                            //lose points 200 and lose a life
+                            if (sharkBites <= 2) {
+                                mainScore = mainScore - 200;
+                            } else {
+                                charLives = charLives - 1;
+                            }
+
+                        }
+                        if (charLives == 0 || charLives != 3) {
+
+                            if (playScore > LastplayScore) {
+                                //new high Score!!!
+                                playScore.text = "NEW HIGH SCORE";
+                            } else {
+                                //thanks for playing
+                                playScoreDisplay.text = mainScore + " Current score";
+                            }
+                        }
+                    }
+                }//end if
                 mainStage.update();
             }//end NewFrame
-            
-            //oh shit you unlocked the speed upgrade
-            function ohShit(){
-                characterSpeed = 9001;
-            }
         </script>
     </head>
     <body onload="Main();">
