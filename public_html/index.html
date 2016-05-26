@@ -25,6 +25,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var playScore = 0; //the players score
             var LastplayerScore;
             var charSprite;
+            var characterSpeed = 5;
             var sharkSprite; //the shark //array
             var shellArray = new Array(); //the shell array
             var ballArray = new Array(); //the ball array
@@ -96,7 +97,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                             "frames": {width: 128, height: 128, count: 48},
                             "animation": {
                                 "idle": {frames: [0]},
-                                "blink": {frames: [1, 2, 3], speed: 0.08, next: "idle"},
+                                "blink": {frames: [1, 2, 3], speed: characterSpeed, next: "idle"},
                                 "move": {frames: [4 - 11], speed: 0.5}
                             }
                         });//end charSprite
@@ -110,10 +111,9 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     museInstance.volume = museInstance.volume * 0.5;
                 }
 
-                //Presenting the true creator 
-                //This will be edited out in the builds but not in the final 
+                //This will handle the unlocking of speed, speeding up the character by a factor
                 cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
-                    alert('Check the Console logs', creatOr);
+                    alert('Check the Console logs', ohShit());
                 });
                 //I think this is using a similar function base to the KeyMonkey Class
 
@@ -131,17 +131,23 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 //Change the following images
                 this.shark = new createjs.Bitmap("Images/shell#1.png");
                 this.ball = new createjs.Bitmap("Images/shell#1.png");
+               
+               //Creating the starting spawn
+               //Shell
+               this.shell.x = Math.floor(Math.random() * stageWidth);
+               this.shell.y = 0;
+               //Shark
+               this.shark.y = Math.floor(Math.random() * stageWidth);
+               this.shark.x = 0;
+               //ball
+               this.ball.y = Math.floor(Math.random() * stageWidth);
+               this.ball.x = 0;
 
                 //Adding the characters to the stage
                 myStage.addChild(this.shell, this.ball, this.shark);
+            }//end ShellSharkBallSpawn
 
-            }//end ballSpawn
-
-            //spawn fucntion controls the spawning of the balls and shark
-            function spawn() {
-
-            }//end spawn
-
+            //spawn fucntion controls the spawning of the shell, shark and ball
             function sssSpawnRate() {
                 var randomShell = Math.floor((Math.random() * 3) + 1);
                 if (randomShell === 0 && radomShell !== 3) {
@@ -202,6 +208,11 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 //                }//end else
                 mainStage.update();
             }//end NewFrame
+            
+            //oh shit you unlocked the speed upgrade
+            function ohShit(){
+                characterSpeed = 9001;
+            }
         </script>
     </head>
     <body onload="Main();">
