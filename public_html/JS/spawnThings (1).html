@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<HTML>
+    <!-- A template for writing javascript and createjs scripts w/o animation.
+    by Miles Inada 5/19/2013
+    Make sure you have a folder named "js" in the same location as this .html file.
+    The createjs library file needs to be in that folder, or this won't work. -->
+    <head>
+        <meta charset="UTF-8"> 
+        <script src="js/createjs-2013.02.12.min.js"></script>
+
+        <script>
+
+
+
+            // ************************ GLOBAL VARIABLES *********************
+            var myStage;
+            var stageWidth;
+            var stageHeight;
+            var myFrameRate = 24;
+            var thorntonData;
+            var boxArray = new Array();
+
+            // ***************************** INIT ********************************
+            function init() {
+                myStage = new createjs.Stage(document.getElementById("myCanvas"));
+                stageWidth = myStage.canvas.width;
+                stageHeight = myStage.canvas.height;
+
+                thorntonData = new createjs.SpriteSheet({
+                    "images": ["images/thorntonSprite02b.png"], //the image(s)
+                    "frames": {width: 64, height: 64, count: 61}, //how to slice it up
+                    "animations": {//which frames make which animations
+                        // 	start, end, next (optional), speed (optional)
+                        "wiggle": [0, 60, "wiggle", 0.5]
+                    }
+                });
+
+
+                //here's the ticker
+                createjs.Ticker.setFPS(myFrameRate);
+                createjs.Ticker.addEventListener("tick", drawNewFrame);
+
+                myStage.update();
+            }
+
+
+            // ****************************** DRAW NEW FRAME ***********************************
+
+            function drawNewFrame(evt) {
+                checkSpawn();
+                moveThings();
+                myStage.update();
+            }// end drawNewFrame
+
+            function checkSpawn() {
+                var rando = Math.floor(Math.random() * 30);
+                if (rando == 0) {
+                    var duh = new Box();
+                    boxArray.push(duh);
+                }
+
+            }
+
+            function moveThings() {
+                for (var i = 0; i < boxArray.length; i++) {
+                    var thisParticularBox = boxArray[i];
+                    thisParticularBox.thornton.x += 5;
+                }
+            }
+
+            function centerRegistration(aThing) {
+                aThing.regX = aThing.image.width * 0.5;
+                aThing.regY = aThing.image.height * 0.5;
+            }
+
+            function Box() {
+                this.thornton = new createjs.Sprite(thorntonData);
+                this.thornton.gotoAndPlay("wiggle");
+                this.thornton.x = 0;
+                this.thornton.y = Math.floor(Math.random() * stageHeight);
+
+                myStage.addChild(this.thornton);
+            }
+
+
+
+            // *********************** End of the Trail ***************************
+        </script>
+    </head>
+    <!-- Add call to our init() function when the browser window is resized -->
+    <body onload="init()">
+        <canvas id="myCanvas" width=640 height=300>Sorry. You need an HTML5 compatible browser to see this.</canvas>
+    </body>
+</HTML>

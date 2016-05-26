@@ -1,23 +1,3 @@
-<!DOCTYPE html>
-<!--
-Coded by Brian Busk II
-Most code is created under Creative Commons, except for KeyMonkey created by 
-Adam Callaway, for Southern Oregon University EMDA 203 and the Cheet.js to add some flair.
-Seriously if you have a chance check out the site just Google it. 
-BAC- Blood Alcohol Level
-Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore because no sprites
-
--->
-<html>
-    <head>
-        <title>Still Untitled</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="JS/createjs-2015.11.26.min.js"></script>
-        <script src="JS/KeyMonkey.js"></script>
-        <script src="JS/cheet.js"></script>
-        <script src="JS/creatOr.js"></script>
-        <script>
             //Global Variables
             var mainStage; //creation of the main stage
             var playName; //allows for the user to place their name in 
@@ -26,9 +6,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var LastplayerScore;
             var charSprite;
             var sharkSprite; //the shark //array
-            var shellArray = new Array(); //the shell array
-            var ballArray = new Array(); //the ball array
-            var sharkArray = new Array(); //the shark array
+            var shellArray = new Array(); //the shell // array
+            var ball; //the ball //array
             var kPressed; //handles the keypress
             var key; //handles which key is pressed
             var sDisplay;
@@ -36,19 +15,6 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var sharkSpeed = 25;
             var stageHeight;
             var stageWidth;
-
-            //[Title View]
-
-            var mainImg = new Image();
-            var main;
-            var startBImg = new Image();
-            var startB;
-            var creditsBImg = new Image();
-            var creditsB;
-
-            //[Title View Group]
-
-            var TitleView = new Container();
 
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
@@ -125,15 +91,34 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 createjs.Ticker.addEventListener("tick", drawNewFrame);
             }//end init
-
-            function ShellSharkBallSpawn() {
+            function shark() {
+                //Shark spriteSheet
+                this.sharkSprite = new create.jsSpriteSheet(
+                        {
+                            "images": ["link to the spritesheet file path"],
+                            "frames": {width: 128, height: 128, count: 48},
+                            "animation": {
+                                "idle": {frames: [0]},
+                                "blink": {frames: [1, 2, 3], speed: 0.08, next: "idle"},
+                                "move": {frames: [4 - 11], speed: 0.5}
+                            }
+                        });//end sharkSprite
+                sharkSprite.box = new createjs.Rectangle(dagger.x, dagger.y, 128, 128);
+                mainStage.addChiled(this.sharkSprite);
+            }//end SharkSpawn
+            function shell() {
                 this.shell = new createjs.Bitmap("Images/shell#1.png");
-                //Change the following images
-                this.shark = new createjs.Bitmap("Images/shell#1.png");
-                this.ball = new createjs.Bitmap("Images/shell#1.png");
+                this.shell.x = Math.floor(Math.random() * stageHeight);
+                this.shell.y = Math.floor(Math.random() * stageWidth);
+                myStage.addChild(this.shape);
 
-                //Adding the characters to the stage
-                myStage.addChild(this.shell, this.ball, this.shark);
+            }//end shellSpawn
+            function ballF() {
+
+                this.shape.x = Math.floor(Math.random() * stageHeight);
+                this.shape.y = Math.floor(Math.random() * stageWidth);
+                myStage.addChild(this.shape);
+
 
             }//end ballSpawn
 
@@ -142,57 +127,37 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
             }//end spawn
 
-            function sssSpawnRate() {
+            function shellSpawn() {
                 var randomShell = Math.floor((Math.random() * 3) + 1);
                 if (randomShell === 0 && radomShell !== 3) {
-                    var shells = new ShellSharkBallSpawn(shell); //spawning a new shell
+                    var shells = new shell(); //spawning a new shell
                     shellArray.push(shells); // pushing the shell into an array
                 }//end if
-                var randomShark = Math.floor((Math.random() * 20) + 1);
-                if (randomShark === 0 && randomShark !== 20) {
-                    var sharks = new ShellSharkBallSpawn(shark); //spawning a new shell
-                    sharkArray.push(sharks); // pushing the shell into an array
-                }//end if
-                var randomBall = Math.floor((Math.random() * 20) + 1);
-                if (randomBall === 0 && radomBall !== 20) {
-                    var balls = new ShellSharkBallSpawn(ball); //spawning a new shell
-                    ballArray.push(balls); // pushing the shell into an array
-                }//end if
-            }//end sssSpawnRate
+            }//end shellSpawn
 
             //Handles the movment of the shark, shell, and ball
             function Movement() {
                 for (var b = 0; b >= shellArray.lenght; b++) {
                     var thisShell = shellArray[b];
-                    thisShell.shell.y += 5;
+                    thisShell.shape.x += 5;
                 }//end for
 
                 for (var x = 0; x >= sharkArray.length; x++) {
                     var thisShark = sharkArray[x];
-                    thisShark.shark.y += 10;
+                    thisShark.shape.x += 10;
                 }//end for
 
                 for (var y = 0; i >= ballArray.length; y++) {
                     var thisBall = ballArray[y];
-                    thisBall.ball.y += 6;
+                    thisBall.shape.x += 6;
                 }//end for
 
-            }//end Movement 
-
-            function addTitleView()
-            {
-                startB.x = 240 - 31.5;
-                startB.y = 160;
-                startB.name = 'startB';
-            }
-
+            }//end Movemen 
 
             function NewFrame(evt) {
                 //functon calls
-                sssSpawnRate();
-                Movement();
-
-
+                spawn();
+                shellSpawn();
 //                if(playerScore != 0){
 //                    if(playerScore>LastplayerScore){
 //                        
@@ -202,10 +167,3 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 //                }//end else
                 mainStage.update();
             }//end NewFrame
-        </script>
-    </head>
-    <body onload="Main();">
-        <!---Modify the canvase based on size of window-->
-        <canvas id="Canvas" width="1920" height="1200">Sorry. You need an HTML5 compatible browser to see this.</canvas>
-    </body>
-</html>
