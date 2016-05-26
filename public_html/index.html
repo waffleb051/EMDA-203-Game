@@ -15,8 +15,6 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="JS/createjs-2015.11.26.min.js"></script>
         <script src="JS/KeyMonkey.js"></script>
-        <script src="JS/cheet.js"></script>
-        <script src="JS/creatOr.js"></script>
         <script>
             //Global Variables
             var mainStage; //creation of the main stage
@@ -37,27 +35,14 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var sharkSpeed = 25;
             var stageHeight;
             var stageWidth;
-
-            //[Title View]
-
-            var mainImg = new Image();
-            var main;
-            var startBImg = new Image();
-            var startB;
-            var creditsBImg = new Image();
-            var creditsB;
-
-            //[Title View Group]
-
-            var TitleView = new Container();
-
+            
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
             createjs.Sound.alternateExtensions = ["mp3"];
             mQueue.installPlugin(createjs.Sound);
             mQueue.addEventListener("complete", musicComplete);
             mQueue.loadManifest([
-                {id: "main", src: "Music/21st Century Surf.mp3", data: 5}
+                {id: "mainSong", src: "Music/21st Century Surf.mp3", data: 5}
             ]); //end Preloader
 
             function musicComplete() {
@@ -68,8 +53,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 //Stage Creation
                 mainStage = new createjs.Stage(document.getElementById("Canvas"));
-                stageWidth = myStage.canvas.width;
-                stageHeight = myStage.canvas.height;
+                stageWidth = mainStage.canvas.width;
+                stageHeight = mainStage.canvas.height;
                 //Placing the stage directions
                 mainStage.NORTH = 0;
                 mainStage.SOUTH = 2;
@@ -91,39 +76,32 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
 
                 //Chracter SpriteSheet
-                charSprite = new create.jsSpriteSheet(
-                        {
-                            "images": ["link to the spritesheet file path"],
-                            "frames": {width: 128, height: 128, count: 48},
-                            "animation": {
-                                "idle": {frames: [0]},
-                                "blink": {frames: [1, 2, 3], speed: characterSpeed, next: "idle"},
-                                "move": {frames: [4 - 11], speed: 0.5}
-                            }
-                        });//end charSprite
+//                charSprite = new create.jsSpriteSheet(
+//                        {
+//                            "images": ["link to the spritesheet file path"],
+//                            "frames": {width: 128, height: 128, count: 48},
+//                            "animation": {
+//                                "idle": {frames: [0]},
+//                                "blink": {frames: [1, 2, 3], speed: characterSpeed, next: "idle"},
+//                                "move": {frames: [4 - 11], speed: 0.5}
+//                            }
+//                        });//end charSprite
 
                 //Playing the music
                 //commented to save my sanity....debugging this code
                 //wait chrome has a mute tab option, thank the Force
-                var museInstance = createjs.Sound.play("main", {loop: -1});
+                var museInstance = createjs.Sound.play("mainSong", {loop: -1});
                 museInstance.on("loop", handleLoop);
                 function handleLoop(event) {
                     museInstance.volume = museInstance.volume * 0.5;
                 }
-
-                //This will handle the unlocking of speed, speeding up the character by a factor
-                cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
-                    alert('Check the Console logs', ohShit());
-                });
-                //I think this is using a similar function base to the KeyMonkey Class
-
                 //display the player score and the players lives
                 //player score
 //                sDisplay.x = 20;
 //                sDisplay.y = 10;
 //                sDisplay.textBaseline = "alphabetic";
 
-                createjs.Ticker.addEventListener("tick", drawNewFrame);
+                createjs.Ticker.addEventListener("tick", NewFrame);
             }//end init
 
             function ShellSharkBallSpawn() {
@@ -185,27 +163,10 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
             }//end Movement 
 
-            function addTitleView()
-            {
-                startB.x = 240 - 31.5;
-                startB.y = 160;
-                startB.name = 'startB';
-            }
-
-
             function NewFrame(evt) {
                 //functon calls
                 sssSpawnRate();
                 Movement();
-
-
-//                if(playerScore != 0){
-//                    if(playerScore>LastplayerScore){
-//                        
-//                    }//end if 
-//                    else(playerScore<=LastplayerScore){
-//                    
-//                }//end else
                 mainStage.update();
             }//end NewFrame
             
@@ -216,7 +177,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
         </script>
     </head>
     <body onload="Main();">
-        <!---Modify the canvase based on size of window-->
+        <!---Modify the canvas based on size of window-->
         <canvas id="Canvas" width="1920" height="1200">Sorry. You need an HTML5 compatible browser to see this.</canvas>
     </body>
 </html>
