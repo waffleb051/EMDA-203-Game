@@ -19,6 +19,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
         <script>
             //Global Variables
             var mainStage; //creation of the main stage
+            var stageWidth;
+            var stageHeigth;
             var Character; //the character
             var charLives = 3;
             var mainScore = 0;
@@ -26,16 +28,17 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var LastplayerScore;
             var charSprite;
             var characterSpeed = 5;
-            var sharkSprite; //the shark //array
             var shellArray = new Array(); //the shell array
             var ballArray = new Array(); //the ball array
             var sharkArray = new Array(); //the shark array
+            var sharkLength = 5;
             var sharkBites = 0;
             var kPressed; //handles the keypress
             var key; //handles which key is pressed
             var sDisplay;
             var frameRate = 24;
 
+            //Does not work all the time
             //Loading of the music, and a few images
             var mQueue = new createjs.LoadQueue();
             createjs.Sound.alternateExtensions = ["mp3"];
@@ -53,6 +56,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 //Stage Creation
                 mainStage = new createjs.Stage(document.getElementById("Canvas"));
+                stageWidth = mainStage.canvas.width;
+                stageHeight = mainStage.canvas.height;
 
                 //Placing the stage directions
                 mainStage.NORTH = 0;
@@ -114,55 +119,57 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 }
 
                 collisionGnome.setDebug(true);
-                createjs.Ticker.addEventListener("tick", NewFrame);
                 createjs.Ticker.setFPS(frameRate);
-            }//end init
+                createjs.Ticker.addEventListener("tick", NewFrame);
 
-            function ShellSharkBallSpawn() {
-                this.shell = new createjs.Bitmap("Images/shell#1.png");
-                //Change the following images
-                this.shark = new createjs.Bitmap("Images/shell#1.png");
-                this.ball = new createjs.Bitmap("Images/shell#1.png");
+            }//end Main
 
-                //Creating the starting spawn
-                //Shell
-                this.shell.x = Math.floor(Math.random() * stageWidth);
-                this.shell.y = 0;
-                //Shark
-                this.shark.y = Math.floor(Math.random() * stageWidth);
-                this.shark.x = 0;
-                //ball
+            function BallCreation() {
+                this.ball = new createjs.Bitmap("Images/shell#2.png");
+                collisionGnome.addCollider(this.ball, 1.5);
                 this.ball.y = Math.floor(Math.random() * stageWidth);
-                this.ball.x = 0;
+                this.ball.x = Math.floor(Math.random() * stageHeight);
+                mainStage.addChild(this.ball);
+            }//end Ball Creatioon
 
-                //Adding the characters to the stage
-                mainStage.addChild(this.shell, this.ball, this.shark);
-            }//end ShellSharkBallSpawn
 
-            //spawn fucntion controls the spawning of the shell, shark and ball
-            function sssSpawnRate() {
-                while (charLives == 3 || charLives <= 1) {
-                    var randomShell = Math.floor((Math.random() * 3) + 1);
-                    if (randomShell === 0 && radomShell !== 3) {
-                        var shells = new ShellSharkBallSpawn(shell); //spawning a new shell
-                        collisionGnome.addCollider(shell, 1.5);
+            function SharkCreation() {
+                this.shark = new createjs.Bitmap("Images/shark.png");
+                collisionGnome.addCollider(this.shark, 1.5);
+                this.shark.y = Math.floor(Math.random() * stageWidth);
+                this.shark.x = Math.floor(Math.random() * stageHeight);
+                mainStage.addChild(this.shark);
+            }//end Shark Creation
+
+            function ShellCreation() {
+                this.shell = new createjs.Bitmap("Images/shell#1.png");
+                collisionGnome.addCollider(this.shell, 1.5);
+                this.shell.x = Math.floor(Math.random() * stageWidth);
+                this.shell.y = Math.floor(Math.random() * stageHeight);
+                mainStage.addChild(this.shell);
+            }//End Shell Creation
+
+            function centralSpawn() {
+                
+                for (var i = 0; i < sharkLength; i++)
+                    var sharks = new SharkCreation(); //spawning a new shark
+                sharkArray.push(sharks); // pushing the shell into an array
+                if (i > 0) {
+                    var balls = new BallCreation(); //spawning a new shell
+                    ballArray.push(balls); // pushing the shell into an array
+                    if (i === 5 || i === 10 || i === 15) {
+                        var shells = new ShellCreation(); //spawning a new shell
                         shellArray.push(shells); // pushing the shell into an array
-                    }//end if
-                    var randomShark = Math.floor((Math.random() * 20) + 1);
-                    if (randomShark === 0 && randomShark !== 20) {
-                        var sharks = new ShellSharkBallSpawn(shark); //spawning a new shell
-                        collisionGnome.addCollider(shark, 1.5);
-                        sharkArray.push(sharks); // pushing the shell into an array
-                    }//end if
-                    var randomBall = Math.floor((Math.random() * 20) + 1);
-                    if (randomBall === 0 && radomBall !== 20) {
-                        var balls = new ShellSharkBallSpawn(ball); //spawning a new shell
-                        collisionGnome.addCollider(ball, 1.5);
-                        ballArray.push(balls); // pushing the shell into an array
-                    }//end if
-                    charLives = charLives;
-                }//end while
-            }//end sssSpawnRate
+                    }//spawn a new shell
+
+                }
+
+            }
+
+            function centerRegistration(aThing) {
+                aThing.regX = aThing.image.width * 0.5;
+                aThing.regY = aThing.image.height * 0.5;
+            }
 
             //Handles the movment of the shark, shell, and ball
             function Movement() {
@@ -173,10 +180,11 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 for (var x = 0; x >= sharkArray.length; x++) {
                     var thisShark = sharkArray[x];
-                    thisShark.shark.y += 10;
+                    thisShark.shark.y += Math.floor((Math.random() * stageHeight) + 1);
+                    thisShark.shark.x += 10;
                 }//end for
 
-                for (var y = 0; i >= ballArray.length; y++) {
+                for (var y = 0; y >= ballArray.length; y++) {
                     var thisBall = ballArray[y];
                     thisBall.ball.y += 6;
                 }//end for
@@ -184,73 +192,74 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             }//end Movement 
 
             function NewFrame(evt) {
-                //functon calls
-                sssSpawnRate();
+                //function calls 
+                for (var w = 4; w < lenght; w++){
+                centralSpawn();
                 Movement();
-
-                //if loop handling the movement 
-                if (keyMonkey["w"] || keyMonkey["up"]) {
-                    character.y -= character.speed;
-                }
-                if (keyMonkey["a"] || keyMonkey["left"]) {
-                    character.x -= character.speed;
-                }
-                if (keyMonkey["s"] || keyMonkey["down"]) {
-                    character.y += character.speed;
-                }
-                if (keyMonkey["d"] || keyMonkey["right"]) {
-                    character.x += character.speed;
-                }
-
-                if (character.x < 0 + character.xDist) {
-                    character.x = 0 + character.xDist;
-                }
-                if (character.y < 0 + character.yDist) {
-                    character.y = 0 + character.yDist;
-                }
-
-                if (character.x > mainStage.canvas.width - character.xDist) {
-                    character.x = mainStage.canvas.width - character.xDist
-                }
-                if (character.y > mainStage.canvas.height - character.yDist) {
-                    character.y = mainStage.canvas.height - character.yDist
-                }
-
-                //if loop handling the collision with the shark, ball or shell
-                if (character.collidesWith(ball) || character.collidesWith(shark) || character.collidesWith(shell)) {
-                    if (charLives != 0) {
-                        if (character.collidesWith(ball)) {
-                            //gain 500 points
-                            mainScore = mainScore + 500;
-
-                        }//end if 
-                        if (character.collidesWith(shell)) {
-                            //gain a life back
-                            charLives = charLives + 1;
-                            mainScore = mainScore + 1000;
-
-                        }//end if
-                        if (character.collidesWith(shark)) {
-                            //lose points 200 and lose a life
-                            if (sharkBites <= 2) {
-                                mainScore = mainScore - 200;
-                            } else {
-                                charLives = charLives - 1;
-                            }
-
-                        }
-                        if (charLives == 0 || charLives != 3) {
-
-                            if (playScore > LastplayScore) {
-                                //new high Score!!!
-                                playScore.text = "NEW HIGH SCORE";
-                            } else {
-                                //thanks for playing
-                                playScoreDisplay.text = mainScore + " Current score";
-                            }
-                        }
-                    }
-                }//end if
+            }
+//                //if loop handling the movement 
+//                if (keyMonkey["w"] || keyMonkey["up"]) {
+//                    character.y -= character.speed;
+//                }
+//                if (keyMonkey["a"] || keyMonkey["left"]) {
+//                    character.x -= character.speed;
+//                }
+//                if (keyMonkey["s"] || keyMonkey["down"]) {
+//                    character.y += character.speed;
+//                }
+//                if (keyMonkey["d"] || keyMonkey["right"]) {
+//                    character.x += character.speed;
+//                }
+//
+//                if (character.x < 0 + character.xDist) {
+//                    character.x = 0 + character.xDist;
+//                }
+//                if (character.y < 0 + character.yDist) {
+//                    character.y = 0 + character.yDist;
+//                }
+//
+//                if (character.x > mainStage.canvas.width - character.xDist) {
+//                    character.x = mainStage.canvas.width - character.xDist
+//                }
+//                if (character.y > mainStage.canvas.height - character.yDist) {
+//                    character.y = mainStage.canvas.height - character.yDist
+//                }
+//
+//                //if loop handling the collision with the shark, ball or shell
+//                if (character.collidesWith(ball) || character.collidesWith(shark) || character.collidesWith(shell)) {
+//                    if (charLives != 0) {
+//                        if (character.collidesWith(ball)) {
+//                            //gain 500 points
+//                            mainScore = mainScore + 500;
+//
+//                        }//end if 
+//                        if (character.collidesWith(shell)) {
+//                            //gain a life back
+//                            charLives = charLives + 1;
+//                            mainScore = mainScore + 1000;
+//
+//                        }//end if
+//                        if (character.collidesWith(shark)) {
+//                            //lose points 200 and lose a life
+//                            if (sharkBites <= 2) {
+//                                mainScore = mainScore - 200;
+//                            } else {
+//                                charLives = charLives - 1;
+//                            }
+//
+//                        }
+//                        if (charLives == 0 || charLives != 3) {
+//
+//                            if (playScore > LastplayScore) {
+//                                //new high Score!!!
+//                                playScore.text = "NEW HIGH SCORE";
+//                            } else {
+//                                //thanks for playing
+//                                playScoreDisplay.text = mainScore + " Current score";
+//                            }
+//                        }
+//                    }
+//                }//end if
                 mainStage.update();
             }//end NewFrame
         </script>
