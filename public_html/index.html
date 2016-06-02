@@ -15,7 +15,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="JS/createjs-2015.11.26.min.js"></script>
         <script src="JS/KeyMonkey.js"></script>
-        <script src="js/collisionGnome.js"></script>
+        <script src="JS/collisionGnome.js"></script>
+        <script src="JS/surferAbove1.js"></script>
         <script>
             //Global Variables
             var mainStage; //creation of the main stage
@@ -37,25 +38,30 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var key; //handles which key is pressed
             var sDisplay;
             var frameRate = 24;
+            var startbutton;
 
-            //Does not work all the time
-            //Loading of the music, and a few images
-            var mQueue = new createjs.LoadQueue();
-            createjs.Sound.alternateExtensions = ["mp3"];
-            mQueue.installPlugin(createjs.Sound);
-            mQueue.addEventListener("complete", musicComplete);
-            mQueue.loadManifest([
-                {id: "mainSong", src: "Music/21st Century Surf.mp3", data: 5}
-            ]); //end Preloader
+
+            function loader() {
+                mainStage = new createjs.Stage(document.getElementById("Canvas"));
+                //Loading of the music, and a few images
+                var mQueue = new createjs.LoadQueue();
+                createjs.Sound.alternateExtensions = ["mp3"];
+                mQueue.installPlugin(createjs.Sound);
+                mQueue.addEventListener("complete", startButtonStart);
+                mQueue.loadManifest([
+                    {id: "mainSong", src: "Music/21st Century Surf.mp3", data: 5}
+                ]); //end Preloader
+            }//end loader
 
             function musicComplete() {
+                mainStage.removeChild(startButton);
+                mainStage.addChild();
                 Main();
             }//end musicComplete
 
             function Main() {
 
                 //Stage Creation
-                mainStage = new createjs.Stage(document.getElementById("Canvas"));
                 stageWidth = mainStage.canvas.width;
                 stageHeight = mainStage.canvas.height;
 
@@ -67,6 +73,10 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 //defining the tile sizes
 
                 mainStage.tileSize = 40; //MAY CHANGE DEPENDING ON THE MISSING SPRITE (05/16)
+
+                //background imgae
+                var background = new createjs.Bitmap("Images/background.png");
+                //mainStage.addChild(background);
 
                 //Array to handle keypresses
                 kPressed = [];
@@ -81,33 +91,31 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 playScoreDisplay.textBaseline = "alphabetic";
                 mainStage.addChild(playScoreDisplay);
 
-                //background imgae
-                var background = new createjs.Bitmap("Images/background.png");
-                mainStage.addChild(background);
-                //User name floater
 
 
                 //Chracter SpriteSheet
-//                charSprite = new create.jsSpriteSheet(
-//                        {
-//                            "images": ["link to the spritesheet file path"],
-//                            "frames": {width: 128, height: 128, count: 48},
-//                            "animation": {
-//                                "idle": {frames: [0]},
-//                                "blink": {frames: [1, 2, 3], speed: characterSpeed, next: "idle"},
-//                                "move": {frames: [4 - 11], speed: 0.5}
-//                            }
-//                        });//end charSprite
-//
-//                //creating a new character
-//                character = new createjs.Sprite(charSprite)
-//                character.gotoAndPlay("something");
-//
-//                character.x = 256;
-//                character.y = 256;
-//                character.speed = characterSpeed;
-//                
-//                collisionGnome.addCollider(character, 1.5);
+                charSprite = new createjs.SpriteSheet(
+                        {
+                            "images": ["Images/surferAbove1.png"],
+                            "frames": {width: 196, height: 276, count: 6},
+                            "animations": {
+                                "idle": {frames: [0, 1, 2, 3, 4, 5]}
+                            }
+                        });//end charSprite
+
+
+
+                //creating a new character
+                character = new createjs.Sprite(charSprite)
+                character.gotoAndPlay("idle");
+
+                mainStage.addChild(character);
+
+
+                character.x = 256;
+                character.y = 256;
+                character.speed = characterSpeed;
+                collisionGnome.addCollider(character, 1.5);
 
                 //Playing the music
                 //commented to save my sanity....debugging this code
@@ -156,25 +164,21 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             }//End Shell Creation
 
             function centralSpawn() {
-                
-                for (var i = 0; i < sharkLength; i++)
-                    var sharks = new SharkCreation(); //spawning a new shark
-                sharkArray.push(sharks); // pushing the shell into an array
-                if (i > 0) {
-                    var balls = new BallCreation(); //spawning a new shell
-                    ballArray.push(balls); // pushing the shell into an array
-                    if (i === 5 || i === 10 || i === 15) {
-                        var shells = new ShellCreation(); //spawning a new shell
-                        shellArray.push(shells); // pushing the shell into an array
-                    }//spawn a new shell
+                if (sharkArray.length <= sharkLength) {
+                    for (var i = 0; i < sharkLength; i++) {
+                        var sharks = new SharkCreation(); //spawning a new shark
+                        sharkArray.push(sharks); // pushing the shell into an array
+                        if (i > 0) {
+                            var balls = new BallCreation(); //spawning a new shell
+                            ballArray.push(balls); // pushing the shell into an array
+                            if (i === 5 || i === 10 || i === 15) {
+                                var shells = new ShellCreation(); //spawning a new shell
+                                shellArray.push(shells); // pushing the shell into an array
+                            }//spawn a new shell
 
+                        }
+                    }
                 }
-
-            }
-
-            function centerRegistration(aThing) {
-                aThing.regX = aThing.image.width * 0.5;
-                aThing.regY = aThing.image.height * 0.5;
             }
 
             //Handles the movment of the shark, shell, and ball
@@ -249,6 +253,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 //                                mainScore = mainScore - 200;
 //                            } else {
 //                                charLives = charLives - 1;
+//                                sharkBites = 0;
 //                            }
 //
 //                        }
@@ -266,9 +271,34 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 //                }//end if
                 mainStage.update();
             }//end NewFrame
+            function startButtonStart() {
+
+
+                var buttonBacking = new createjs.Shape();
+                buttonBacking.name = "background";
+                buttonBacking.graphics.beginFill("blue").drawRoundRect(0, 0, 150, 60, 10);
+
+
+                var text = new createjs.Text("Start", "bold 24px Arial", "#FFFFFF");
+                text.name = "label";
+                text.textAlign = "center";
+                text.textBaseline = "middle";
+                text.x = 150 / 2;
+                text.y = 60 / 2;
+
+                startButton = new createjs.Container();
+                startButton.name = "startButton";
+                startButton.x = 20;
+                startButton.y = 20;
+                startButton.addChild(buttonBacking, text);
+                startButton.addEventListener("mousedown", musicComplete);
+
+                mainStage.addChild(startButton);
+                mainStage.update();
+            }
         </script>
     </head>
-    <body onload="Main();">
+    <body onload="loader();">
         <!---Modify the canvas based on size of window-->
         <canvas id="Canvas" width="1920" height="1200">Sorry. You need an HTML5 compatible browser to see this.</canvas>
     </body>
