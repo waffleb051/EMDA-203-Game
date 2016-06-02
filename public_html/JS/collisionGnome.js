@@ -4,8 +4,9 @@
     window.collisionGnome = window.collisionGnome || {};
 
     var COLLISION_GNOME_DEBUG = false;
-
-    function setDebug(cgDebug) {
+    var myStage;
+    function setDebug(cgDebug, myStage_) {
+        myStage = myStage_;
         COLLISION_GNOME_DEBUG = cgDebug;
     }
 
@@ -39,11 +40,11 @@
         if (spriteInfo.type == "Bitmap") {
             sprite.yDist = Math.floor(sprite.image.height / 2 * ratio);
             sprite.xDist = Math.floor(sprite.image.width / 2 * ratio);
-            console.log("Bitmap xDist: " + sprite.xDist + " yDist: " + sprite.yDist);
+            //console.log("Bitmap xDist: " + sprite.xDist + " yDist: " + sprite.yDist);
         } else if (spriteInfo.type == "Sprite") {
             sprite.yDist = Math.floor(sprite.getBounds().height / 2 * ratio);
             sprite.xDist = Math.floor(sprite.getBounds().width / 2 * ratio);
-            console.log("Sprite xDist: " + sprite.xDist + " yDist: " + sprite.yDist);
+            //console.log("Sprite xDist: " + sprite.xDist + " yDist: " + sprite.yDist);
         }
         sprite.collidesWith = function (other) {
             if (!other.xDist || !other.yDist) {
