@@ -125,10 +125,12 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             }//end Main
 
             function BallCreation() {
-                this.ball = new createjs.Bitmap("Images/shell#2.png");
+                this.ball = new createjs.Bitmap("Images/shell2.png");
                 collisionGnome.addCollider(this.ball, 1.5);
                 this.ball.y = Math.floor(Math.random() * stageWidth);
                 this.ball.x = Math.floor(Math.random() * stageHeight);
+                this.ball.scaleX = 0.1;
+                this.ball.scaleY = 0.1;
                 mainStage.addChild(this.ball);
             }//end Ball Creatioon
 
@@ -138,14 +140,18 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 collisionGnome.addCollider(this.shark, 1.5);
                 this.shark.y = Math.floor(Math.random() * stageWidth);
                 this.shark.x = Math.floor(Math.random() * stageHeight);
+                this.shark.scaleX = 0.12;
+                this.shark.scaleY = 0.12;
                 mainStage.addChild(this.shark);
             }//end Shark Creation
 
             function ShellCreation() {
-                this.shell = new createjs.Bitmap("Images/shell#1.png");
+                this.shell = new createjs.Bitmap("Images/shell1.png");
                 collisionGnome.addCollider(this.shell, 1.5);
                 this.shell.x = Math.floor(Math.random() * stageWidth);
                 this.shell.y = Math.floor(Math.random() * stageHeight);
+                this.shell.scaleX = 0.07;
+                this.shell.scaleY = 0.07;
                 mainStage.addChild(this.shell);
             }//End Shell Creation
 
