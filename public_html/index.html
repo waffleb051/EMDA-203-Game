@@ -26,7 +26,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var Character; //the character
             var charLives = 3;
             var mainScore = 0;
-            var playScoreDisplay = new createjs.Text(mainScore.toString() + " Current score", "40px Arial", "#000000");
+            var background = new createjs.Bitmap("Images/background.png");
+            var playScoreDisplay = new createjs.Text(mainScore.toString() + " Current score", "12px Arial", "#000000");
             var LastplayerScore;
             var charSprite;
             var characterSpeed = 20;
@@ -44,7 +45,9 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
 
             function loader() {
+                //first thing loaded on the game
                 mainStage = new createjs.Stage(document.getElementById("Canvas"));
+                mainStage.addChild(background);
                 //Loading of the music, and a few images
                 var mQueue = new createjs.LoadQueue();
                 createjs.Sound.alternateExtensions = ["mp3"];
@@ -56,7 +59,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             }//end loader
 
             function musicComplete() {
-                mainStage.removeChild(startButton);
+                mainStage.removeChild(startButton, creditButton);
                 mainStage.addChild();
                 Main();
             }//end musicComplete
@@ -74,12 +77,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 mainStage.WEST = 3;
                 //defining the tile sizes
 
-                mainStage.tileSize = 40; //MAY CHANGE DEPENDING ON THE MISSING SPRITE (05/16)
-
-                //background imgae
-                var background = new createjs.Bitmap("Images/background.png");
-                mainStage.addChild(background);
-
+                mainStage.tileSize = 40;
                 //Array to handle keypresses
                 kPressed = [];
 
@@ -88,8 +86,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
 
                 //Score floater array
                 mainStage.addEventListener(NewFrame);
-                playScoreDisplay.x = 20;
-                playScoreDisplay.y = 80;
+                playScoreDisplay.x = 10;
+                playScoreDisplay.y = 60;
                 playScoreDisplay.textBaseline = "alphabetic";
                 mainStage.addChild(playScoreDisplay);
 
@@ -130,7 +128,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     museInstance.volume = museInstance.volume * 0.5;
                 }
 
-                collisionGnome.setDebug(true, mainStage);
+                collisionGnome.setDebug(false, mainStage);
                 createjs.Ticker.setFPS(frameRate);
                 createjs.Ticker.addEventListener("tick", NewFrame);
 
@@ -269,10 +267,10 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                         console.log("shell collision " + j);
                         charLives = charLives + 1;
                         mainScore = mainScore + 1000;
-                       var removeShell = shellArray.splice(j, 1)[0];
-                       
-                       mainStage.removeChild(removeShell.shell);
-                                              
+                        var removeShell = shellArray.splice(j, 1)[0];
+
+                        mainStage.removeChild(removeShell.shell);
+
                     }
 
                 }
@@ -281,15 +279,14 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     if (character.collidesWith(ballArray[j].ball)) {
                         //gain 500 points
                         mainScore = mainScore + 500;
-                                            mainStage.removeChild(ballArray.splice(j, 1)[0].ball);
+                        mainStage.removeChild(ballArray.splice(j, 1)[0].ball);
                     }
 
                 }
                 mainStage.update();
             }//end NewFrame
             function startButtonStart() {
-
-
+                //creating the two buttons background
                 var buttonBacking = new createjs.Shape();
                 buttonBacking.name = "background";
                 buttonBacking.graphics.beginFill("blue").drawRoundRect(0, 0, 150, 60, 10);
@@ -309,13 +306,52 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 startButton.addChild(buttonBacking, text);
                 startButton.addEventListener("mousedown", musicComplete);
 
-                mainStage.addChild(startButton);
+                var buttonBacking2 = new createjs.Shape();
+                buttonBacking2.name = "background2";
+                buttonBacking2.graphics.beginFill("red").drawRoundRect(0, 0, 150, 60, 10);
+
+                var creditText = new createjs.Text("Credits", "bold 24px Arial", "#FFFFFF");
+                creditText.name = "label";
+                creditText.textAlign = "center";
+                creditText.textBaseline = "middle";
+                creditText.x = 150 / 2;
+                creditText.y = 60 / 2;
+
+                creditButton = new createjs.Container();
+                creditButton.name = "creditButton";
+                creditButton.x = 300;
+                creditButton.y = 20;
+                creditButton.addChild(buttonBacking2, creditText);
+                creditButton.addEventListener("mousedown", creditsButton);
+
+                mainStage.addChild(startButton, creditButton);
                 mainStage.update();
+            }
+            function creditsButton() {
+                var buttonBacking = new createjs.Shape();
+                buttonBacking.name = "background";
+                buttonBacking.graphics.beginFill("blue").drawRoundRect(0, 0, 300, 120, 10);
+
+                var creditText = new createjs.Text("Music by Duncan O" + "\n" + "Coded by Brian Busk" + "\n" + "Images inspired by" +
+                        "The two other people in the group", "bold 24px Arial", "#FFFFFF");
+                creditText.name = "label";
+                creditText.textAlign = "center";
+                creditText.textBaseline = "middle";
+                creditText.x = 300 / 2;
+                creditText.y = 120 / 2;
+
+                creditButton = new createjs.Container();
+                creditButton.name = "creditButton";
+                creditButton.x = 60;
+                creditButton.y = 60;
+                creditButton.addChild(buttonBacking, creditText);
+                creditButton.addEventListener("mousedown", musicComplete);
+
             }
         </script>
     </head>
     <body onload="loader();">
-        <!---Modify the canvas based on size of window-->
-        <canvas id="Canvas" width="1920" height="1200">Sorry. You need an HTML5 compatible browser to see this.</canvas>
+        <!---Canvas shrunk down from -->
+        <canvas id="Canvas" width="800" height="600">Sorry. You need an HTML5 compatible browser to see this.</canvas>
     </body>
 </html>
