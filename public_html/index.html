@@ -27,7 +27,8 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             var charLives = 3;
             var mainScore = 0;
             var background = new createjs.Bitmap("Images/background.png");
-            var playScoreDisplay = new createjs.Text(mainScore.toString() + " Current score", "12px Arial", "#000000");
+            var playScoreDisplay = new createjs.Text(mainScore.toString() + " Current score", "18px Arial", "#000000");
+            var playLivesDisplay = new createjs.Text(charLives.toString() + " Current lives", "18px Arial", "#000000");
             var LastplayerScore;
             var charSprite;
             var characterSpeed = 20;
@@ -87,9 +88,15 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 //Score floater array
                 mainStage.addEventListener(NewFrame);
                 playScoreDisplay.x = 10;
-                playScoreDisplay.y = 60;
+                playScoreDisplay.y = 30;
                 playScoreDisplay.textBaseline = "alphabetic";
                 mainStage.addChild(playScoreDisplay);
+                
+                mainStage.addEventListener(NewFrame);
+                playLivesDisplay.x = 10;
+                playLivesDisplay.y = 60;
+                playLivesDisplay.textBaseline = "alphabetic";
+                mainStage.addChild(playLivesDisplay);
 
 
 
@@ -127,7 +134,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 function handleLoop(event) {
                     museInstance.volume = museInstance.volume * 0.5;
                 }
-
+                                               
                 collisionGnome.setDebug(false, mainStage);
                 createjs.Ticker.setFPS(frameRate);
                 createjs.Ticker.addEventListener("tick", NewFrame);
@@ -173,7 +180,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     for (var i = 0; i < sharkDiff; i++) {
                         var sharks = new SharkCreation(); //spawning a new shark
                         sharkArray.push(sharks); // pushing the shell into an array
-
+                        Movement();
                     }
                 }
 
@@ -182,6 +189,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     for (var i = 0; i < ballDiff; i++) {
                         var ball = new BallCreation(); //spawning a new shark
                         ballArray.push(ball); // pushing the shell into an array
+                        Movement();
 
                     }
                 }
@@ -190,6 +198,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                     for (var i = 0; i < shellDiff; i++) {
                         var shell = new ShellCreation(); //spawning a new shark
                         shellArray.push(shell); // pushing the shell into an array
+                        Movement();
 
                     }
                 }
@@ -199,18 +208,23 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
             function Movement() {
                 for (var b = 0; b >= shellArray.lenght; b++) {
                     var thisShell = shellArray[b];
-                    thisShell.shell.y += 5;
+                    createjs.Tween.get(shellArray[b], {loop:false});
+                    thisShell.shell.to({y:Math.floor((Math.random() * stageHeight) + 1)});
+                    thisShell.shell.x += 5;
                 }//end for
 
                 for (var x = 0; x >= sharkArray.length; x++) {
                     var thisShark = sharkArray[x];
-                    thisShark.shark.y += Math.floor((Math.random() * stageHeight) + 1);
+                    createjs.Tween.get(sharkArray[x], {loop:false});
+                    thisShark.shark.to({y:Math.floor((Math.random() * stageHeight) + 1)});
                     thisShark.shark.x += 10;
                 }//end for
 
                 for (var y = 0; y >= ballArray.length; y++) {
                     var thisBall = ballArray[y];
-                    thisBall.ball.y += 6;
+                    createjs.Tween.get(ballArray[y], {loop:false});
+                    thisBall.ball.to({y:Math.floor((Math.random() * stageHeight) + 1)});
+                    thisBall.ball.x += 6;
                 }//end for
 
             }//end Movement 
@@ -285,6 +299,12 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 }
                 mainStage.update();
             }//end NewFrame
+            
+            function scoreSystem(evt){
+                
+                
+            }
+            
             function startButtonStart() {
                 //creating the two buttons background
                 var buttonBacking = new createjs.Shape();
@@ -332,8 +352,7 @@ Project Started (05/15) Hours Spent as of this day: 4 hours Cant do anymore beca
                 buttonBacking.name = "background";
                 buttonBacking.graphics.beginFill("blue").drawRoundRect(0, 0, 300, 120, 10);
 
-                var creditText = new createjs.Text("Music by Duncan O" + "\n" + "Coded by Brian Busk" + "\n" + "Images inspired by" +
-                        "The two other people in the group", "bold 24px Arial", "#FFFFFF");
+                
                 creditText.name = "label";
                 creditText.textAlign = "center";
                 creditText.textBaseline = "middle";
